@@ -3,353 +3,387 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PropriAI – Assistant Immobilier</title>
+<title>PropriAI – Intelligence Immobilière</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; min-height: 100vh; }
-.container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
-.app-header { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e0e0d8; }
-.logo-mark { width: 38px; height: 38px; border-radius: 10px; background: #1D9E75; display: flex; align-items: center; justify-content: center; }
-.logo-mark svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.logo-name { font-size: 20px; font-weight: 600; color: #1a1a1a; }
-.logo-tag { font-size: 12px; color: #888; }
-.screen { display: none; }
-.screen.active { display: block; }
-.section-title { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
-.section-sub { font-size: 13px; color: #777; margin-bottom: 1.5rem; }
-.offer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
-.offer-card { background: #fff; border: 1.5px solid #e0e0d8; border-radius: 14px; padding: 1.25rem; cursor: pointer; transition: border-color 0.15s; }
-.offer-card:hover { border-color: #1D9E75; }
-.offer-card.selected { border: 2px solid #1D9E75; background: #f6fdf9; }
-.offer-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-bottom: 0.75rem; }
-.badge-lifetime { background: #E1F5EE; color: #0F6E56; }
-.badge-monthly { background: #ede9fe; color: #5b21b6; }
-.offer-price { font-size: 30px; font-weight: 700; color: #1a1a1a; line-height: 1; margin-bottom: 4px; }
-.offer-price sub { font-size: 13px; font-weight: 400; color: #888; }
-.offer-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 0.75rem 0 0.5rem; }
-.offer-features { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-.offer-features li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #555; line-height: 1.5; }
-.offer-features li .check { color: #1D9E75; }
-.api-field { background: #fff; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; border: 1px solid #e0e0d8; }
-.api-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
-.api-hint { font-size: 12px; color: #888; margin-bottom: 10px; }
-.api-field input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #1a1a1a; font-family: monospace; background: #fafafa; }
-.api-link { font-size: 12px; color: #1D9E75; margin-top: 8px; display: inline-block; text-decoration: none; }
-.btn-primary { width: 100%; padding: 14px; background: #1D9E75; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; font-family: inherit; }
-.btn-primary:hover { opacity: 0.88; }
-.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-back { background: none; border: 1px solid #ddd; border-radius: 8px; padding: 7px 14px; font-size: 13px; color: #666; cursor: pointer; font-family: inherit; margin-bottom: 1.5rem; }
-.btn-back:hover { background: #f5f5f0; }
-.plan-info { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-left: 8px; vertical-align: middle; }
-.tab-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
-.tab { padding: 12px 14px; border: 1.5px solid #e0e0d8; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font-family: inherit; transition: all 0.15s; }
-.tab:hover { border-color: #1D9E75; }
-.tab.active { border: 2px solid #1D9E75; background: #f6fdf9; }
-.tab-icon { font-size: 20px; margin-bottom: 5px; }
-.tab-title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-.tab-sub { font-size: 11px; color: #888; margin-top: 2px; }
-.panel { display: none; }
-.panel.active { display: block; }
-.field-group { margin-bottom: 1rem; }
-.field-label { font-size: 13px; color: #666; margin-bottom: 5px; display: block; }
-textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; resize: vertical; color: #1a1a1a; background: #fff; font-family: inherit; min-height: 80px; }
-select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #1a1a1a; background: #fff; font-family: inherit; }
-.upload-zone { border: 2px dashed #ccc; border-radius: 12px; padding: 1.75rem; text-align: center; cursor: pointer; background: #fafafa; transition: all 0.15s; margin-bottom: 1rem; }
-.upload-zone:hover { border-color: #1D9E75; background: #f6fdf9; }
-.upload-icon { font-size: 32px; margin-bottom: 0.5rem; }
-.upload-zone p { font-size: 14px; color: #555; margin-bottom: 3px; }
-.upload-zone span { font-size: 12px; color: #aaa; }
-input[type="file"] { display: none; }
-.file-info { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: #E1F5EE; border-radius: 8px; margin-bottom: 1rem; font-size: 12px; color: #0F6E56; }
-.photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-bottom: 1rem; }
-.photo-thumb { aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
-.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.result-box { margin-top: 1.25rem; background: #fff; border: 1px solid #e0e0d8; border-radius: 12px; overflow: hidden; display: none; }
-.result-header { padding: 10px 16px; background: #f5f5f0; border-bottom: 1px solid #e0e0d8; font-size: 13px; font-weight: 600; color: #1a1a1a; }
-.result-body { padding: 16px; font-size: 14px; line-height: 1.75; color: #1a1a1a; }
-.result-body h3 { font-size: 14px; font-weight: 600; margin: 1rem 0 0.4rem; }
-.result-body h3:first-child { margin-top: 0; }
-.result-body p { margin-bottom: 0.6rem; }
-.result-body ul { padding-left: 1.25rem; margin-bottom: 0.6rem; }
-.result-body li { margin-bottom: 4px; }
-.copy-btn { margin-top: 1rem; padding: 8px 16px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 12px; color: #555; font-family: inherit; }
-.copy-btn:hover { background: #f0f0f0; }
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
-@keyframes spin { to { transform: rotate(360deg); } }
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--gold:#C9A84C;--gold-light:#F0DFA0;--gold-dark:#8B6914;--navy:#1B2B4B;--navy-light:#2D4270;--cream:#FAF8F3;--white:#FFFFFF;--text:#1a1a1a;--muted:#6B7280;}
+body{font-family:'Inter',sans-serif;background:var(--cream);min-height:100vh;}
+.container{max-width:680px;margin:0 auto;}
+.screen{display:none;}.screen.active{display:block;}
+
+.hero{background:var(--navy);padding:2.5rem 1.5rem 2rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border:1px solid rgba(201,168,76,0.2);border-radius:50%;}
+.hero::after{content:'';position:absolute;bottom:-60px;left:-30px;width:160px;height:160px;border:1px solid rgba(201,168,76,0.15);border-radius:50%;}
+.hero-inner{position:relative;z-index:1;}
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
+.logo-emblem{width:44px;height:44px;border:1.5px solid var(--gold);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.logo-name{font-family:'Playfair Display',serif;font-size:22px;color:var(--white);letter-spacing:0.05em;}
+.logo-tagline{font-size:11px;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-top:2px;}
+.hero-headline{font-family:'Playfair Display',serif;font-size:26px;color:var(--white);line-height:1.3;margin-bottom:0.5rem;}
+.hero-sub{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;font-weight:300;}
+
+.offer-section{padding:1.75rem 1.5rem 0;}
+.section-eyebrow{font-size:10px;color:var(--gold-dark);letter-spacing:0.15em;text-transform:uppercase;font-weight:600;margin-bottom:1rem;}
+.offer-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
+.offer-card{background:var(--white);border:1.5px solid #E5DDD0;border-radius:8px;padding:1.25rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.offer-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#E5DDD0;transition:background 0.2s;}
+.offer-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+.offer-card:hover::before,.offer-card.selected::before{background:var(--gold);}
+.offer-card.selected{border-color:var(--gold);}
+.offer-popular{position:absolute;top:10px;right:10px;background:var(--gold);color:var(--white);font-size:9px;font-weight:600;padding:2px 8px;border-radius:2px;letter-spacing:0.08em;text-transform:uppercase;}
+.offer-price{font-family:'Playfair Display',serif;font-size:28px;color:var(--navy);line-height:1;margin-bottom:4px;}
+.offer-price sub{font-family:'Inter',sans-serif;font-size:12px;font-weight:400;color:var(--muted);}
+.offer-name{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.offer-features{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.offer-features li{font-size:12px;color:var(--muted);display:flex;align-items:flex-start;gap:6px;line-height:1.4;}
+.offer-features li::before{content:'—';color:var(--gold);font-size:10px;flex-shrink:0;margin-top:1px;}
+
+.input-zone{margin:0 1.5rem 1.25rem;background:var(--white);border:1.5px solid #E5DDD0;border-radius:8px;padding:1.25rem;display:none;}
+.input-zone-title{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:4px;letter-spacing:0.02em;}
+.input-zone-hint{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+.input-zone input{width:100%;padding:10px 12px;border:1.5px solid #E5DDD0;border-radius:6px;font-size:13px;color:var(--navy);background:var(--cream);font-family:'Inter',sans-serif;}
+.input-zone input:focus{outline:none;border-color:var(--gold);}
+.input-zone input.code-input{font-family:monospace;letter-spacing:0.1em;text-transform:uppercase;}
+.input-link{font-size:11px;color:var(--gold-dark);margin-top:6px;display:inline-block;text-decoration:none;font-weight:600;}
+
+.btn-main{display:block;margin:0 1.5rem 1rem;padding:15px;background:var(--navy);color:var(--white);border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.04em;transition:all 0.2s;width:calc(100% - 3rem);text-align:center;}
+.btn-main:hover{background:var(--navy-light);}
+.btn-main:disabled{background:#ccc;cursor:not-allowed;}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-gold:hover{background:var(--gold-dark);color:var(--white);}
+
+.trust-strip{display:flex;justify-content:center;gap:1.5rem;padding:0 1.5rem 1.5rem;flex-wrap:wrap;}
+.trust-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.trust-item::before{content:'✓';color:var(--gold);font-weight:700;font-size:10px;}
+
+.error-msg{margin:0 1.5rem 1rem;padding:10px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;font-size:12px;color:#DC2626;display:none;}
+
+.app-topbar{background:var(--navy);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
+.topbar-logo{display:flex;align-items:center;gap:10px;}
+.topbar-emblem{width:32px;height:32px;border:1px solid var(--gold);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.topbar-name{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);}
+.plan-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:2px;letter-spacing:0.06em;text-transform:uppercase;}
+.plan-auto{background:var(--gold);color:var(--navy);}
+.plan-cle{background:var(--navy-light);color:var(--white);border:1px solid var(--gold);}
+
+.btn-back-flat{display:block;margin:1rem 1.5rem;background:none;border:1.5px solid #E5DDD0;border-radius:6px;padding:9px 14px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;text-align:left;}
+.btn-back-flat:hover{border-color:var(--gold);color:var(--navy);}
+
+.mode-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 1.5rem;margin-bottom:1.75rem;}
+.mode-btn{background:var(--white);border:1.5px solid #E5DDD0;border-radius:8px;padding:1rem;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;transition:all 0.2s;position:relative;overflow:hidden;}
+.mode-btn::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:#E5DDD0;transition:background 0.2s;}
+.mode-btn.active{border-color:var(--gold);}
+.mode-btn.active::before{background:var(--gold);}
+.mode-icon{font-size:22px;margin-bottom:6px;}
+.mode-title{font-size:13px;font-weight:600;color:var(--navy);}
+.mode-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+.panel{display:none;padding:0 1.5rem;}
+.panel.active{display:block;}
+.field-label{font-size:11px;color:var(--navy);margin-bottom:6px;display:block;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;}
+.prem-select{width:100%;padding:11px 14px;border:1.5px solid #E5DDD0;border-radius:6px;font-size:13px;color:var(--navy);background:var(--white);font-family:'Inter',sans-serif;margin-bottom:1rem;appearance:none;}
+.prem-select:focus{outline:none;border-color:var(--gold);}
+.prem-textarea{width:100%;padding:11px 14px;border:1.5px solid #E5DDD0;border-radius:6px;font-size:13px;color:var(--navy);background:var(--white);font-family:'Inter',sans-serif;resize:vertical;min-height:90px;margin-bottom:1rem;}
+.prem-textarea:focus{outline:none;border-color:var(--gold);}
+
+.upload-prem{border:1.5px dashed var(--gold);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--white);transition:all 0.2s;margin-bottom:1rem;}
+.upload-prem:hover{background:#FFFDF5;border-color:var(--gold-dark);}
+.upload-icon{font-size:26px;margin-bottom:6px;}
+.upload-prem p{font-size:13px;color:var(--navy);margin-bottom:3px;font-weight:500;}
+.upload-prem span{font-size:11px;color:var(--muted);}
+input[type="file"]{display:none;}
+.file-ok{display:none;align-items:center;gap:8px;padding:8px 12px;background:#F5F9F0;border:1px solid #C5DEB0;border-radius:6px;margin-bottom:1rem;font-size:12px;color:#3A6B1E;font-weight:500;}
+.photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-bottom:1rem;}
+.photo-thumb{aspect-ratio:1;border-radius:6px;overflow:hidden;border:1.5px solid #E5DDD0;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+
+.result-prem{background:var(--white);border:1.5px solid #E5DDD0;border-radius:8px;overflow:hidden;margin:0 1.5rem 1.5rem;display:none;}
+.result-prem-header{padding:12px 16px;background:var(--navy);font-size:12px;font-weight:600;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;}
+.result-prem-body{padding:16px;font-size:13px;line-height:1.8;color:var(--text);}
+.result-prem-body h3{font-family:'Playfair Display',serif;font-size:15px;margin:0.75rem 0 0.4rem;color:var(--navy);}
+.result-prem-body h3:first-child{margin-top:0;}
+.result-prem-body p{margin-bottom:0.6rem;}
+.result-prem-body ul{padding-left:1.25rem;margin-bottom:0.6rem;}
+.result-prem-body li{margin-bottom:4px;}
+.copy-prem{margin-top:0.75rem;padding:8px 16px;border:1.5px solid #E5DDD0;border-radius:5px;background:var(--cream);cursor:pointer;font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;letter-spacing:0.04em;transition:all 0.15s;}
+.copy-prem:hover{border-color:var(--gold);color:var(--navy);}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="app-header">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-    <div>
-      <div class="logo-name">PropriAI</div>
-      <div class="logo-tag">L'assistant immobilier tout-en-un</div>
-    </div>
-  </div>
 
+  <!-- ÉCRAN OFFRES -->
   <div class="screen active" id="screen-offers">
-    <div class="section-title">Choisissez votre offre</div>
-    <div class="section-sub">Sélectionnez le plan qui correspond à votre utilisation.</div>
-    <div class="offer-grid">
-      <div class="offer-card" id="card-autonome" onclick="selectOffer('autonome')">
-        <div class="offer-badge badge-lifetime">Accès à vie</div>
-        <div class="offer-price">97 € <sub>une seule fois</sub></div>
-        <div class="offer-title">Offre Autonome</div>
-        <ul class="offer-features">
-          <li><span class="check">✓</span> Accès illimité à vie</li>
-          <li><span class="check">✓</span> Analyse juridique & annonces</li>
-          <li><span class="check">✓</span> Mises à jour incluses</li>
-          <li><span class="check">🔑</span> Votre propre clé API (~2-5€/mois)</li>
-        </ul>
-      </div>
-      <div class="offer-card" id="card-clecenmain" onclick="selectOffer('clecenmain')">
-        <div class="offer-badge badge-monthly">Abonnement mensuel</div>
-        <div class="offer-price">29 € <sub>/mois</sub></div>
-        <div class="offer-title">Offre Clé en main</div>
-        <ul class="offer-features">
-          <li><span class="check">✓</span> Tout inclus, sans configuration</li>
-          <li><span class="check">✓</span> Analyse juridique & annonces</li>
-          <li><span class="check">✓</span> Clé API gérée pour vous</li>
-          <li><span class="check">✓</span> Support prioritaire</li>
-        </ul>
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="logo-row">
+          <div class="logo-emblem">🏛️</div>
+          <div>
+            <div class="logo-name">PropriAI</div>
+            <div class="logo-tagline">Intelligence Immobilière</div>
+          </div>
+        </div>
+        <div class="hero-headline">L'expertise juridique et créative au service de vos biens.</div>
+        <div class="hero-sub">Analyse de contrats et rédaction d'annonces premium, en quelques secondes.</div>
       </div>
     </div>
-    <div class="api-field" id="api-field-block" style="display:none;">
-      <div class="api-label">🔑 Votre clé API Anthropic</div>
-      <div class="api-hint">Nécessaire pour l'offre Autonome. Créez votre clé sur console.anthropic.com</div>
-      <input type="password" id="user-api-key" placeholder="sk-ant-api03-..." oninput="updateAccessBtn()" />
-      <a class="api-link" href="https://console.anthropic.com" target="_blank">→ Obtenir une clé API gratuite</a>
+
+    <div class="offer-section">
+      <div class="section-eyebrow">Choisissez votre formule</div>
+      <div class="offer-grid">
+        <div class="offer-card" id="card-autonome" onclick="selectOffer('autonome')">
+          <div class="offer-price">97 € <sub>à vie</sub></div>
+          <div class="offer-name">Autonome</div>
+          <ul class="offer-features">
+            <li>Accès illimité à vie</li>
+            <li>Analyse juridique & annonces</li>
+            <li>Votre propre clé API</li>
+          </ul>
+        </div>
+        <div class="offer-card" id="card-clecenmain" onclick="selectOffer('clecenmain')">
+          <div class="offer-popular">Recommandé</div>
+          <div class="offer-price">29 € <sub>/mois</sub></div>
+          <div class="offer-name">Clé en main</div>
+          <ul class="offer-features">
+            <li>Tout inclus</li>
+            <li>Aucune configuration</li>
+            <li>Support prioritaire</li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <button class="btn-primary" id="btn-access" onclick="accessApp()" disabled>Accéder à PropriAI →</button>
+
+    <div class="input-zone" id="zone-autonome">
+      <div class="input-zone-title">Votre clé API Anthropic</div>
+      <div class="input-zone-hint">Créez votre clé sur console.anthropic.com. Comptez 2 à 5€/mois selon votre usage.</div>
+      <input type="password" id="user-api-key" placeholder="sk-ant-api03-..." oninput="updateBtn()" />
+      <a class="input-link" href="https://console.anthropic.com" target="_blank">→ Obtenir ma clé API</a>
+    </div>
+
+    <div class="input-zone" id="zone-clecenmain">
+      <div class="input-zone-title">Code d'accès</div>
+      <div class="input-zone-hint">Vous avez reçu ce code par email après votre achat sur Gumroad.</div>
+      <input type="text" class="code-input" id="access-code" placeholder="PROP-XXXX-XXXX" oninput="updateBtn()" maxlength="14" />
+    </div>
+
+    <div class="error-msg" id="error-msg">Code d'accès invalide. Vérifiez votre email ou contactez le support.</div>
+
+    <button class="btn-main btn-gold" id="btn-access" onclick="accessApp()" disabled>Accéder à PropriAI</button>
+
+    <div class="trust-strip">
+      <div class="trust-item">Paiement sécurisé</div>
+      <div class="trust-item">Remboursé sous 30 jours</div>
+      <div class="trust-item">Données confidentielles</div>
+    </div>
   </div>
 
+  <!-- ÉCRAN APPLICATION -->
   <div class="screen" id="screen-app">
-    <div style="display:flex; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:8px;">
-      <button class="btn-back" onclick="goBack()">← Changer d'offre</button>
-      <span class="plan-info" id="plan-pill"></span>
-    </div>
-    <div class="tab-row">
-      <button class="tab active" onclick="switchTab('juridique')" id="tab-juridique">
-        <div class="tab-icon">🛡️</div>
-        <div class="tab-title">Analyse juridique</div>
-        <div class="tab-sub">Clauses à risque</div>
-      </button>
-      <button class="tab" onclick="switchTab('annonce')" id="tab-annonce">
-        <div class="tab-icon">📸</div>
-        <div class="tab-title">Génération d'annonce</div>
-        <div class="tab-sub">Photos → texte de vente</div>
-      </button>
-    </div>
-    <div class="panel active" id="panel-juridique">
-      <div class="field-group">
-        <label class="field-label">Type de contrat</label>
-        <select id="contract-type">
-          <option value="bail">Bail d'habitation</option>
-          <option value="compromis">Compromis de vente</option>
-          <option value="promesse">Promesse unilatérale de vente</option>
-          <option value="etat_lieux">État des lieux</option>
-        </select>
+    <div class="app-topbar">
+      <div class="topbar-logo">
+        <div class="topbar-emblem">🏛️</div>
+        <div class="topbar-name">PropriAI</div>
       </div>
-      <div class="upload-zone" onclick="document.getElementById('pdf-input').click()">
-        <input type="file" id="pdf-input" accept=".pdf,.txt" onchange="handlePdfFile(this)">
-        <div class="upload-icon">📄</div>
-        <p>Déposez votre contrat ici</p>
+      <span class="plan-tag" id="plan-badge"></span>
+    </div>
+
+    <button class="btn-back-flat" onclick="goBack()">← Changer de formule</button>
+
+    <div class="mode-row">
+      <button class="mode-btn active" onclick="switchMode('juridique')" id="mode-juridique">
+        <div class="mode-icon">⚖️</div>
+        <div class="mode-title">Analyse juridique</div>
+        <div class="mode-sub">Détection des risques</div>
+      </button>
+      <button class="mode-btn" onclick="switchMode('annonce')" id="mode-annonce">
+        <div class="mode-icon">✍️</div>
+        <div class="mode-title">Rédiger une annonce</div>
+        <div class="mode-sub">Photos → texte premium</div>
+      </button>
+    </div>
+
+    <div class="panel active" id="panel-juridique">
+      <label class="field-label">Type de contrat</label>
+      <select class="prem-select" id="contract-type">
+        <option value="bail">Bail d'habitation</option>
+        <option value="compromis">Compromis de vente</option>
+        <option value="promesse">Promesse unilatérale de vente</option>
+        <option value="etat_lieux">État des lieux</option>
+      </select>
+      <div class="upload-prem" onclick="document.getElementById('pdf-input').click()">
+        <input type="file" id="pdf-input" accept=".pdf,.txt" onchange="handlePdf(this)">
+        <div class="upload-icon">📋</div>
+        <p>Déposer le contrat</p>
         <span>PDF ou texte – max 5 Mo</span>
       </div>
-      <div class="file-info" id="pdf-file-info">✅ <span id="pdf-filename"></span></div>
-      <div class="field-group">
-        <label class="field-label">Ou collez le texte du contrat directement</label>
-        <textarea id="contract-text" placeholder="Collez ici les clauses ou le texte complet du contrat…"></textarea>
-      </div>
-      <button class="btn-primary" id="btn-juridique" onclick="analyzeContract()">🔍 Analyser le contrat</button>
-      <div class="result-box" id="result-juridique">
-        <div class="result-header">📋 Rapport d'analyse juridique</div>
-        <div class="result-body" id="result-juridique-body"></div>
-      </div>
+      <div class="file-ok" id="pdf-info">✓ <span id="pdf-name"></span></div>
+      <label class="field-label">Ou coller le texte</label>
+      <textarea class="prem-textarea" id="contract-text" placeholder="Collez ici le texte intégral du contrat…"></textarea>
+      <button class="btn-main" id="btn-juridique" onclick="analyzeContract()" style="margin:0 0 1.5rem;width:100%;">Analyser le contrat</button>
     </div>
+
     <div class="panel" id="panel-annonce">
-      <div class="upload-zone" onclick="document.getElementById('photos-input').click()">
+      <div class="upload-prem" onclick="document.getElementById('photos-input').click()">
         <input type="file" id="photos-input" accept="image/*" multiple onchange="handlePhotos(this)">
         <div class="upload-icon">🖼️</div>
-        <p>Déposez 1 à 5 photos du bien</p>
-        <span>JPG, PNG, WEBP</span>
+        <p>Déposer les photos du bien</p>
+        <span>1 à 5 photos – JPG, PNG, WEBP</span>
       </div>
       <div class="photos-grid" id="photos-grid"></div>
-      <div class="field-group">
-        <label class="field-label">Informations complémentaires (optionnel)</label>
-        <textarea id="bien-info" placeholder="Ex: T3, 68m², Paris 11e, balcon, parquet, expo sud, 450 000€…"></textarea>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Type de bien</label>
-        <select id="bien-type">
-          <option value="appartement">Appartement</option>
-          <option value="maison">Maison</option>
-          <option value="studio">Studio</option>
-          <option value="villa">Villa / Propriété de prestige</option>
-          <option value="terrain">Terrain</option>
-        </select>
-      </div>
-      <button class="btn-primary" id="btn-annonce" onclick="generateAd()">✨ Générer l'annonce</button>
-      <div class="result-box" id="result-annonce">
-        <div class="result-header">📝 Annonce générée</div>
-        <div class="result-body" id="result-annonce-body"></div>
-      </div>
+      <label class="field-label">Informations complémentaires</label>
+      <textarea class="prem-textarea" id="bien-info" placeholder="Surface, localisation, équipements, prix…"></textarea>
+      <label class="field-label">Type de bien</label>
+      <select class="prem-select" id="bien-type">
+        <option value="appartement">Appartement</option>
+        <option value="maison">Maison</option>
+        <option value="studio">Studio</option>
+        <option value="villa">Villa / Propriété de prestige</option>
+        <option value="terrain">Terrain</option>
+      </select>
+      <button class="btn-main btn-gold" id="btn-annonce" onclick="generateAd()" style="margin:0 0 1.5rem;width:100%;">Générer l'annonce</button>
+    </div>
+
+    <div class="result-prem" id="result-juridique">
+      <div class="result-prem-header">⚖️ Rapport d'analyse juridique</div>
+      <div class="result-prem-body" id="result-juridique-body"></div>
+    </div>
+    <div class="result-prem" id="result-annonce">
+      <div class="result-prem-header">✍️ Annonce immobilière</div>
+      <div class="result-prem-body" id="result-annonce-body"></div>
     </div>
   </div>
+
 </div>
-
 <script>
-let currentOffer = null;
-let userApiKey = '';
-let pdfText = '';
-let photosBase64 = [];
+let currentOffer=null,userApiKey='',accessCode='',pdfText='',photosBase64=[];
 
-function selectOffer(offer) {
-  currentOffer = offer;
-  document.getElementById('card-autonome').classList.toggle('selected', offer === 'autonome');
-  document.getElementById('card-clecenmain').classList.toggle('selected', offer === 'clecenmain');
-  document.getElementById('api-field-block').style.display = offer === 'autonome' ? 'block' : 'none';
-  updateAccessBtn();
+function selectOffer(o){
+  currentOffer=o;
+  document.getElementById('card-autonome').classList.toggle('selected',o==='autonome');
+  document.getElementById('card-clecenmain').classList.toggle('selected',o==='clecenmain');
+  document.getElementById('zone-autonome').style.display=o==='autonome'?'block':'none';
+  document.getElementById('zone-clecenmain').style.display=o==='clecenmain'?'block':'none';
+  document.getElementById('error-msg').style.display='none';
+  updateBtn();
 }
 
-function updateAccessBtn() {
-  const btn = document.getElementById('btn-access');
-  if (!currentOffer) { btn.disabled = true; return; }
-  btn.disabled = currentOffer === 'autonome' && document.getElementById('user-api-key').value.trim().length < 10;
+function updateBtn(){
+  const btn=document.getElementById('btn-access');
+  if(!currentOffer){btn.disabled=true;return;}
+  if(currentOffer==='autonome') btn.disabled=document.getElementById('user-api-key').value.trim().length<10;
+  else btn.disabled=document.getElementById('access-code').value.trim().length<14;
 }
 
-function accessApp() {
-  userApiKey = currentOffer === 'autonome' ? document.getElementById('user-api-key').value.trim() : '';
-  const pill = document.getElementById('plan-pill');
-  pill.textContent = currentOffer === 'autonome' ? 'Offre Autonome – 97€ à vie' : 'Offre Clé en main – 29€/mois';
-  pill.style.cssText = currentOffer === 'autonome' ? 'background:#E1F5EE;color:#0F6E56;' : 'background:#ede9fe;color:#5b21b6;';
+async function accessApp(){
+  document.getElementById('error-msg').style.display='none';
+  if(currentOffer==='autonome'){
+    userApiKey=document.getElementById('user-api-key').value.trim();
+    showApp();
+  } else {
+    accessCode=document.getElementById('access-code').value.trim().toUpperCase();
+    const btn=document.getElementById('btn-access');
+    btn.disabled=true;
+    btn.innerHTML='<span class="spinner"></span> Vérification…';
+    try {
+      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_verify:true,accessCode})});
+      const data=await res.json();
+      if(data.error&&data.error.includes('invalide')){
+        document.getElementById('error-msg').style.display='block';
+        btn.disabled=false;btn.innerHTML='Accéder à PropriAI';
+      } else { showApp(); }
+    } catch(e){
+      document.getElementById('error-msg').style.display='block';
+      btn.disabled=false;btn.innerHTML='Accéder à PropriAI';
+    }
+  }
+}
+
+function showApp(){
+  const badge=document.getElementById('plan-badge');
+  badge.textContent=currentOffer==='autonome'?'Autonome':'Clé en main';
+  badge.className='plan-tag '+(currentOffer==='autonome'?'plan-auto':'plan-cle');
   document.getElementById('screen-offers').classList.remove('active');
   document.getElementById('screen-app').classList.add('active');
 }
 
-function goBack() {
+function goBack(){
   document.getElementById('screen-app').classList.remove('active');
   document.getElementById('screen-offers').classList.add('active');
 }
 
-function switchTab(tab) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-' + tab).classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
+function switchMode(m){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+m).classList.add('active');
+  document.getElementById('mode-'+m).classList.add('active');
+  document.getElementById('result-juridique').style.display='none';
+  document.getElementById('result-annonce').style.display='none';
 }
 
-function handlePdfFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  document.getElementById('pdf-filename').textContent = file.name;
-  document.getElementById('pdf-file-info').style.display = 'flex';
-  const r = new FileReader();
-  r.onload = e => { pdfText = e.target.result; };
-  r.readAsText(file);
+function handlePdf(input){const f=input.files[0];if(!f)return;document.getElementById('pdf-name').textContent=f.name;document.getElementById('pdf-info').style.display='flex';const r=new FileReader();r.onload=e=>{pdfText=e.target.result;};r.readAsText(f);}
+
+function handlePhotos(input){
+  const files=Array.from(input.files).slice(0,5);photosBase64=[];
+  const grid=document.getElementById('photos-grid');grid.innerHTML='';
+  files.forEach(file=>{const reader=new FileReader();reader.onload=e=>{photosBase64.push({data:e.target.result.split(',')[1],type:file.type});const div=document.createElement('div');div.className='photo-thumb';const img=document.createElement('img');img.src=e.target.result;div.appendChild(img);grid.appendChild(div);};reader.readAsDataURL(file);});
 }
 
-function handlePhotos(input) {
-  const files = Array.from(input.files).slice(0, 5);
-  photosBase64 = [];
-  const grid = document.getElementById('photos-grid');
-  grid.innerHTML = '';
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      photosBase64.push({ data: e.target.result.split(',')[1], type: file.type });
-      const div = document.createElement('div');
-      div.className = 'photo-thumb';
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      div.appendChild(img);
-      grid.appendChild(div);
-    };
-    reader.readAsDataURL(file);
-  });
-}
+function setLoading(id,loading,label){const b=document.getElementById(id);b.disabled=loading;b.innerHTML=loading?'<span class="spinner"></span> En cours…':label;}
 
-function setLoading(btnId, loading, label) {
-  const btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  btn.innerHTML = loading ? '<span class="spinner"></span> Analyse en cours…' : label;
-}
-
-async function callAPI(body) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (currentOffer === 'autonome') {
-    headers['x-api-key'] = userApiKey;
-    headers['anthropic-version'] = '2023-06-01';
-    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body) });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.content?.[0]?.text || '';
+async function callAPI(body){
+  if(currentOffer==='autonome'){
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':userApiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify(body)});
+    const d=await r.json();if(d.error)throw new Error(d.error.message);return d.content?.[0]?.text||'';
   } else {
-    const res = await fetch('/api/chat', { method: 'POST', headers, body: JSON.stringify(body) });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.content?.[0]?.text || '';
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,accessCode})});
+    const d=await r.json();if(d.error)throw new Error(d.error.message);return d.content?.[0]?.text||'';
   }
 }
 
-async function analyzeContract() {
-  const text = document.getElementById('contract-text').value.trim() || pdfText;
-  if (!text) { alert('Collez le texte du contrat ou uploadez un fichier.'); return; }
-  setLoading('btn-juridique', true, '');
-  document.getElementById('result-juridique').style.display = 'none';
-  const type = document.getElementById('contract-type').value;
-  const labels = { bail: "bail d'habitation", compromis: 'compromis de vente', promesse: 'promesse unilatérale de vente', etat_lieux: 'état des lieux' };
-  const prompt = `Agis comme un expert juridique immobilier senior en France (2026). Analyse ce ${labels[type]} et identifie les risques.\n\n1. Résumé du document\n2. Analyse des risques (clauses abusives, omissions, illégalités selon loi ALUR)\n3. Recommandations correctives\n4. Score de sécurité /100\n\nFormat HTML simple (<h3>, <ul><li>, <strong> pour les alertes).\n\nDOCUMENT :\n${text.slice(0, 4000)}`;
-  try {
-    const html = await callAPI({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] });
-    document.getElementById('result-juridique-body').innerHTML = html + '<br><button class="copy-btn" onclick="copyText(\'result-juridique-body\')">📋 Copier le rapport</button>';
-    document.getElementById('result-juridique').style.display = 'block';
-  } catch(e) {
-    document.getElementById('result-juridique-body').innerHTML = '<p style="color:red">Erreur : ' + e.message + '</p>';
-    document.getElementById('result-juridique').style.display = 'block';
+async function analyzeContract(){
+  const text=document.getElementById('contract-text').value.trim()||pdfText;
+  if(!text){alert('Collez le texte ou uploadez un fichier.');return;}
+  setLoading('btn-juridique',true,'');
+  document.getElementById('result-juridique').style.display='none';
+  const labels={bail:"bail d'habitation",compromis:'compromis de vente',promesse:'promesse unilatérale',etat_lieux:'état des lieux'};
+  const type=document.getElementById('contract-type').value;
+  try{
+    const html=await callAPI({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:`Expert juridique immobilier France 2026. Analyse ce ${labels[type]}.\n1. Résumé\n2. Risques et clauses abusives (loi ALUR)\n3. Recommandations\n4. Score de sécurité /100\nFormat HTML (<h3><ul><li><strong>).\n\n${text.slice(0,4000)}`}]});
+    document.getElementById('result-juridique-body').innerHTML=html+'<br><button class="copy-prem" onclick="copyText(\'result-juridique-body\')">Copier le rapport</button>';
+    document.getElementById('result-juridique').style.display='block';
+  }catch(e){
+    document.getElementById('result-juridique-body').innerHTML='<p style="color:#c0392b">Erreur : '+e.message+'</p>';
+    document.getElementById('result-juridique').style.display='block';
   }
-  setLoading('btn-juridique', false, '🔍 Analyser le contrat');
+  setLoading('btn-juridique',false,'Analyser le contrat');
 }
 
-async function generateAd() {
-  const bienInfo = document.getElementById('bien-info').value.trim();
-  const bienType = document.getElementById('bien-type').value;
-  if (photosBase64.length === 0 && !bienInfo) { alert('Uploadez au moins une photo ou renseignez les informations du bien.'); return; }
-  setLoading('btn-annonce', true, '');
-  document.getElementById('result-annonce').style.display = 'none';
-  const sys = `Rédige une annonce immobilière professionnelle et émotionnelle en français.\nFormat HTML : <h3> titre, <p> hook, <p> description, <ul><li> points forts, <p><em> hashtags.`;
+async function generateAd(){
+  const bienInfo=document.getElementById('bien-info').value.trim();
+  const bienType=document.getElementById('bien-type').value;
+  if(!photosBase64.length&&!bienInfo){alert('Uploadez une photo ou renseignez les informations.');return;}
+  setLoading('btn-annonce',true,'');
+  document.getElementById('result-annonce').style.display='none';
+  const sys=`Rédige une annonce immobilière premium en français, style agence de prestige. Format HTML : <h3> titre élégant, <p> introduction évocatrice, <p> description sensorielle, <ul><li> atouts, <p><em> hashtags.`;
   let messages;
-  if (photosBase64.length > 0) {
-    messages = [{ role: 'user', content: [
-      { type: 'text', text: `${sys}\nType : ${bienType}. ${bienInfo ? 'Infos : ' + bienInfo : ''}\nAnalyse les photos et génère l'annonce.` },
-      ...photosBase64.map(p => ({ type: 'image', source: { type: 'base64', media_type: p.type, data: p.data } }))
-    ]}];
-  } else {
-    messages = [{ role: 'user', content: `${sys}\nType : ${bienType}. Infos : ${bienInfo}. Génère l'annonce complète.` }];
+  if(photosBase64.length>0){messages=[{role:'user',content:[{type:'text',text:`${sys}\nType : ${bienType}. ${bienInfo?'Infos : '+bienInfo:''}`},...photosBase64.map(p=>({type:'image',source:{type:'base64',media_type:p.type,data:p.data}}))]}];}
+  else{messages=[{role:'user',content:`${sys}\nType : ${bienType}. Infos : ${bienInfo}.`}];}
+  try{
+    const html=await callAPI({model:'claude-sonnet-4-6',max_tokens:1000,messages});
+    document.getElementById('result-annonce-body').innerHTML=html+'<br><button class="copy-prem" onclick="copyText(\'result-annonce-body\')">Copier l\'annonce</button>';
+    document.getElementById('result-annonce').style.display='block';
+  }catch(e){
+    document.getElementById('result-annonce-body').innerHTML='<p style="color:#c0392b">Erreur : '+e.message+'</p>';
+    document.getElementById('result-annonce').style.display='block';
   }
-  try {
-    const html = await callAPI({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages });
-    document.getElementById('result-annonce-body').innerHTML = html + '<br><button class="copy-btn" onclick="copyText(\'result-annonce-body\')">📋 Copier l\'annonce</button>';
-    document.getElementById('result-annonce').style.display = 'block';
-  } catch(e) {
-    document.getElementById('result-annonce-body').innerHTML = '<p style="color:red">Erreur : ' + e.message + '</p>';
-    document.getElementById('result-annonce').style.display = 'block';
-  }
-  setLoading('btn-annonce', false, '✨ Générer l\'annonce');
+  setLoading('btn-annonce',false,'Générer l\'annonce');
 }
 
-function copyText(id) {
-  const el = document.getElementById(id);
-  navigator.clipboard.writeText(el.innerText).then(() => {
-    const btn = el.querySelector('.copy-btn');
-    const orig = btn.innerHTML;
-    btn.innerHTML = '✅ Copié !';
-    setTimeout(() => { btn.innerHTML = orig; }, 2000);
-  });
-}
+function copyText(id){const el=document.getElementById(id);navigator.clipboard.writeText(el.innerText).then(()=>{const btn=el.querySelector('.copy-prem');const orig=btn.innerHTML;btn.innerHTML='Copié ✓';setTimeout(()=>{btn.innerHTML=orig;},2000);});}
 </script>
 </body>
 </html>
