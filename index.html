@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PropriAI – Assistant Immobilier</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; min-height: 100vh; }
+.container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+.app-header { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e0e0d8; }
+.logo-mark { width: 38px; height: 38px; border-radius: 10px; background: #1D9E75; display: flex; align-items: center; justify-content: center; }
+.logo-mark svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.logo-name { font-size: 20px; font-weight: 600; color: #1a1a1a; }
+.logo-tag { font-size: 12px; color: #888; }
+.screen { display: none; }
+.screen.active { display: block; }
+.section-title { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+.section-sub { font-size: 13px; color: #777; margin-bottom: 1.5rem; }
+.offer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
+.offer-card { background: #fff; border: 1.5px solid #e0e0d8; border-radius: 14px; padding: 1.25rem; cursor: pointer; transition: border-color 0.15s; }
+.offer-card:hover { border-color: #1D9E75; }
+.offer-card.selected { border: 2px solid #1D9E75; background: #f6fdf9; }
+.offer-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-bottom: 0.75rem; }
+.badge-lifetime { background: #E1F5EE; color: #0F6E56; }
+.badge-monthly { background: #ede9fe; color: #5b21b6; }
+.offer-price { font-size: 30px; font-weight: 700; color: #1a1a1a; line-height: 1; margin-bottom: 4px; }
+.offer-price sub { font-size: 13px; font-weight: 400; color: #888; }
+.offer-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 0.75rem 0 0.5rem; }
+.offer-features { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.offer-features li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #555; line-height: 1.5; }
+.offer-features li .check { color: #1D9E75; }
+.api-field { background: #fff; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; border: 1px solid #e0e0d8; }
+.api-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+.api-hint { font-size: 12px; color: #888; margin-bottom: 10px; }
+.api-field input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #1a1a1a; font-family: monospace; background: #fafafa; }
+.api-link { font-size: 12px; color: #1D9E75; margin-top: 8px; display: inline-block; text-decoration: none; }
+.btn-primary { width: 100%; padding: 14px; background: #1D9E75; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; font-family: inherit; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-back { background: none; border: 1px solid #ddd; border-radius: 8px; padding: 7px 14px; font-size: 13px; color: #666; cursor: pointer; font-family: inherit; margin-bottom: 1.5rem; }
+.btn-back:hover { background: #f5f5f0; }
+.plan-info { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-left: 8px; vertical-align: middle; }
+.tab-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.tab { padding: 12px 14px; border: 1.5px solid #e0e0d8; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font-family: inherit; transition: all 0.15s; }
+.tab:hover { border-color: #1D9E75; }
+.tab.active { border: 2px solid #1D9E75; background: #f6fdf9; }
+.tab-icon { font-size: 20px; margin-bottom: 5px; }
+.tab-title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+.tab-sub { font-size: 11px; color: #888; margin-top: 2px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.field-group { margin-bottom: 1rem; }
+.field-label { font-size: 13px; color: #666; margin-bottom: 5px; display: block; }
+textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; resize: vertical; color: #1a1a1a; background: #fff; font-family: inherit; min-height: 80px; }
+select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #1a1a1a; background: #fff; font-family: inherit; }
+.upload-zone { border: 2px dashed #ccc; border-radius: 12px; padding: 1.75rem; text-align: center; cursor: pointer; background: #fafafa; transition: all 0.15s; margin-bottom: 1rem; }
+.upload-zone:hover { border-color: #1D9E75; background: #f6fdf9; }
+.upload-icon { font-size: 32px; margin-bottom: 0.5rem; }
+.upload-zone p { font-size: 14px; color: #555; margin-bottom: 3px; }
+.upload-zone span { font-size: 12px; color: #aaa; }
+input[type="file"] { display: none; }
+.file-info { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: #E1F5EE; border-radius: 8px; margin-bottom: 1rem; font-size: 12px; color: #0F6E56; }
+.photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-bottom: 1rem; }
+.photo-thumb { aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.result-box { margin-top: 1.25rem; background: #fff; border: 1px solid #e0e0d8; border-radius: 12px; overflow: hidden; display: none; }
+.result-header { padding: 10px 16px; background: #f5f5f0; border-bottom: 1px solid #e0e0d8; font-size: 13px; font-weight: 600; color: #1a1a1a; }
+.result-body { padding: 16px; font-size: 14px; line-height: 1.75; color: #1a1a1a; }
+.result-body h3 { font-size: 14px; font-weight: 600; margin: 1rem 0 0.4rem; }
+.result-body h3:first-child { margin-top: 0; }
+.result-body p { margin-bottom: 0.6rem; }
+.result-body ul { padding-left: 1.25rem; margin-bottom: 0.6rem; }
+.result-body li { margin-bottom: 4px; }
+.copy-btn { margin-top: 1rem; padding: 8px 16px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 12px; color: #555; font-family: inherit; }
+.copy-btn:hover { background: #f0f0f0; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="app-header">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div>
+      <div class="logo-name">PropriAI</div>
+      <div class="logo-tag">L'assistant immobilier tout-en-un</div>
+    </div>
+  </div>
+
+  <div class="screen active" id="screen-offers">
+    <div class="section-title">Choisissez votre offre</div>
+    <div class="section-sub">Sélectionnez le plan qui correspond à votre utilisation.</div>
+    <div class="offer-grid">
+      <div class="offer-card" id="card-autonome" onclick="selectOffer('autonome')">
+        <div class="offer-badge badge-lifetime">Accès à vie</div>
+        <div class="offer-price">97 € <sub>une seule fois</sub></div>
+        <div class="offer-title">Offre Autonome</div>
+        <ul class="offer-features">
+          <li><span class="check">✓</span> Accès illimité à vie</li>
+          <li><span class="check">✓</span> Analyse juridique & annonces</li>
+          <li><span class="check">✓</span> Mises à jour incluses</li>
+          <li><span class="check">🔑</span> Votre propre clé API (~2-5€/mois)</li>
+        </ul>
+      </div>
+      <div class="offer-card" id="card-clecenmain" onclick="selectOffer('clecenmain')">
+        <div class="offer-badge badge-monthly">Abonnement mensuel</div>
+        <div class="offer-price">29 € <sub>/mois</sub></div>
+        <div class="offer-title">Offre Clé en main</div>
+        <ul class="offer-features">
+          <li><span class="check">✓</span> Tout inclus, sans configuration</li>
+          <li><span class="check">✓</span> Analyse juridique & annonces</li>
+          <li><span class="check">✓</span> Clé API gérée pour vous</li>
+          <li><span class="check">✓</span> Support prioritaire</li>
+        </ul>
+      </div>
+    </div>
+    <div class="api-field" id="api-field-block" style="display:none;">
+      <div class="api-label">🔑 Votre clé API Anthropic</div>
+      <div class="api-hint">Nécessaire pour l'offre Autonome. Créez votre clé sur console.anthropic.com</div>
+      <input type="password" id="user-api-key" placeholder="sk-ant-api03-..." oninput="updateAccessBtn()" />
+      <a class="api-link" href="https://console.anthropic.com" target="_blank">→ Obtenir une clé API gratuite</a>
+    </div>
+    <button class="btn-primary" id="btn-access" onclick="accessApp()" disabled>Accéder à PropriAI →</button>
+  </div>
+
+  <div class="screen" id="screen-app">
+    <div style="display:flex; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:8px;">
+      <button class="btn-back" onclick="goBack()">← Changer d'offre</button>
+      <span class="plan-info" id="plan-pill"></span>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('juridique')" id="tab-juridique">
+        <div class="tab-icon">🛡️</div>
+        <div class="tab-title">Analyse juridique</div>
+        <div class="tab-sub">Clauses à risque</div>
+      </button>
+      <button class="tab" onclick="switchTab('annonce')" id="tab-annonce">
+        <div class="tab-icon">📸</div>
+        <div class="tab-title">Génération d'annonce</div>
+        <div class="tab-sub">Photos → texte de vente</div>
+      </button>
+    </div>
+    <div class="panel active" id="panel-juridique">
+      <div class="field-group">
+        <label class="field-label">Type de contrat</label>
+        <select id="contract-type">
+          <option value="bail">Bail d'habitation</option>
+          <option value="compromis">Compromis de vente</option>
+          <option value="promesse">Promesse unilatérale de vente</option>
+          <option value="etat_lieux">État des lieux</option>
+        </select>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('pdf-input').click()">
+        <input type="file" id="pdf-input" accept=".pdf,.txt" onchange="handlePdfFile(this)">
+        <div class="upload-icon">📄</div>
+        <p>Déposez votre contrat ici</p>
+        <span>PDF ou texte – max 5 Mo</span>
+      </div>
+      <div class="file-info" id="pdf-file-info">✅ <span id="pdf-filename"></span></div>
+      <div class="field-group">
+        <label class="field-label">Ou collez le texte du contrat directement</label>
+        <textarea id="contract-text" placeholder="Collez ici les clauses ou le texte complet du contrat…"></textarea>
+      </div>
+      <button class="btn-primary" id="btn-juridique" onclick="analyzeContract()">🔍 Analyser le contrat</button>
+      <div class="result-box" id="result-juridique">
+        <div class="result-header">📋 Rapport d'analyse juridique</div>
+        <div class="result-body" id="result-juridique-body"></div>
+      </div>
+    </div>
+    <div class="panel" id="panel-annonce">
+      <div class="upload-zone" onclick="document.getElementById('photos-input').click()">
+        <input type="file" id="photos-input" accept="image/*" multiple onchange="handlePhotos(this)">
+        <div class="upload-icon">🖼️</div>
+        <p>Déposez 1 à 5 photos du bien</p>
+        <span>JPG, PNG, WEBP</span>
+      </div>
+      <div class="photos-grid" id="photos-grid"></div>
+      <div class="field-group">
+        <label class="field-label">Informations complémentaires (optionnel)</label>
+        <textarea id="bien-info" placeholder="Ex: T3, 68m², Paris 11e, balcon, parquet, expo sud, 450 000€…"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Type de bien</label>
+        <select id="bien-type">
+          <option value="appartement">Appartement</option>
+          <option value="maison">Maison</option>
+          <option value="studio">Studio</option>
+          <option value="villa">Villa / Propriété de prestige</option>
+          <option value="terrain">Terrain</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="btn-annonce" onclick="generateAd()">✨ Générer l'annonce</button>
+      <div class="result-box" id="result-annonce">
+        <div class="result-header">📝 Annonce générée</div>
+        <div class="result-body" id="result-annonce-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentOffer = null;
+let userApiKey = '';
+let pdfText = '';
+let photosBase64 = [];
+
+function selectOffer(offer) {
+  currentOffer = offer;
+  document.getElementById('card-autonome').classList.toggle('selected', offer === 'autonome');
+  document.getElementById('card-clecenmain').classList.toggle('selected', offer === 'clecenmain');
+  document.getElementById('api-field-block').style.display = offer === 'autonome' ? 'block' : 'none';
+  updateAccessBtn();
+}
+
+function updateAccessBtn() {
+  const btn = document.getElementById('btn-access');
+  if (!currentOffer) { btn.disabled = true; return; }
+  btn.disabled = currentOffer === 'autonome' && document.getElementById('user-api-key').value.trim().length < 10;
+}
+
+function accessApp() {
+  userApiKey = currentOffer === 'autonome' ? document.getElementById('user-api-key').value.trim() : '';
+  const pill = document.getElementById('plan-pill');
+  pill.textContent = currentOffer === 'autonome' ? 'Offre Autonome – 97€ à vie' : 'Offre Clé en main – 29€/mois';
+  pill.style.cssText = currentOffer === 'autonome' ? 'background:#E1F5EE;color:#0F6E56;' : 'background:#ede9fe;color:#5b21b6;';
+  document.getElementById('screen-offers').classList.remove('active');
+  document.getElementById('screen-app').classList.add('active');
+}
+
+function goBack() {
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-offers').classList.add('active');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function handlePdfFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('pdf-filename').textContent = file.name;
+  document.getElementById('pdf-file-info').style.display = 'flex';
+  const r = new FileReader();
+  r.onload = e => { pdfText = e.target.result; };
+  r.readAsText(file);
+}
+
+function handlePhotos(input) {
+  const files = Array.from(input.files).slice(0, 5);
+  photosBase64 = [];
+  const grid = document.getElementById('photos-grid');
+  grid.innerHTML = '';
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      photosBase64.push({ data: e.target.result.split(',')[1], type: file.type });
+      const div = document.createElement('div');
+      div.className = 'photo-thumb';
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      div.appendChild(img);
+      grid.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function setLoading(btnId, loading, label) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="spinner"></span> Analyse en cours…' : label;
+}
+
+async function callAPI(body) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (currentOffer === 'autonome') {
+    headers['x-api-key'] = userApiKey;
+    headers['anthropic-version'] = '2023-06-01';
+    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content?.[0]?.text || '';
+  } else {
+    const res = await fetch('/api/chat', { method: 'POST', headers, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content?.[0]?.text || '';
+  }
+}
+
+async function analyzeContract() {
+  const text = document.getElementById('contract-text').value.trim() || pdfText;
+  if (!text) { alert('Collez le texte du contrat ou uploadez un fichier.'); return; }
+  setLoading('btn-juridique', true, '');
+  document.getElementById('result-juridique').style.display = 'none';
+  const type = document.getElementById('contract-type').value;
+  const labels = { bail: "bail d'habitation", compromis: 'compromis de vente', promesse: 'promesse unilatérale de vente', etat_lieux: 'état des lieux' };
+  const prompt = `Agis comme un expert juridique immobilier senior en France (2026). Analyse ce ${labels[type]} et identifie les risques.\n\n1. Résumé du document\n2. Analyse des risques (clauses abusives, omissions, illégalités selon loi ALUR)\n3. Recommandations correctives\n4. Score de sécurité /100\n\nFormat HTML simple (<h3>, <ul><li>, <strong> pour les alertes).\n\nDOCUMENT :\n${text.slice(0, 4000)}`;
+  try {
+    const html = await callAPI({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] });
+    document.getElementById('result-juridique-body').innerHTML = html + '<br><button class="copy-btn" onclick="copyText(\'result-juridique-body\')">📋 Copier le rapport</button>';
+    document.getElementById('result-juridique').style.display = 'block';
+  } catch(e) {
+    document.getElementById('result-juridique-body').innerHTML = '<p style="color:red">Erreur : ' + e.message + '</p>';
+    document.getElementById('result-juridique').style.display = 'block';
+  }
+  setLoading('btn-juridique', false, '🔍 Analyser le contrat');
+}
+
+async function generateAd() {
+  const bienInfo = document.getElementById('bien-info').value.trim();
+  const bienType = document.getElementById('bien-type').value;
+  if (photosBase64.length === 0 && !bienInfo) { alert('Uploadez au moins une photo ou renseignez les informations du bien.'); return; }
+  setLoading('btn-annonce', true, '');
+  document.getElementById('result-annonce').style.display = 'none';
+  const sys = `Rédige une annonce immobilière professionnelle et émotionnelle en français.\nFormat HTML : <h3> titre, <p> hook, <p> description, <ul><li> points forts, <p><em> hashtags.`;
+  let messages;
+  if (photosBase64.length > 0) {
+    messages = [{ role: 'user', content: [
+      { type: 'text', text: `${sys}\nType : ${bienType}. ${bienInfo ? 'Infos : ' + bienInfo : ''}\nAnalyse les photos et génère l'annonce.` },
+      ...photosBase64.map(p => ({ type: 'image', source: { type: 'base64', media_type: p.type, data: p.data } }))
+    ]}];
+  } else {
+    messages = [{ role: 'user', content: `${sys}\nType : ${bienType}. Infos : ${bienInfo}. Génère l'annonce complète.` }];
+  }
+  try {
+    const html = await callAPI({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages });
+    document.getElementById('result-annonce-body').innerHTML = html + '<br><button class="copy-btn" onclick="copyText(\'result-annonce-body\')">📋 Copier l\'annonce</button>';
+    document.getElementById('result-annonce').style.display = 'block';
+  } catch(e) {
+    document.getElementById('result-annonce-body').innerHTML = '<p style="color:red">Erreur : ' + e.message + '</p>';
+    document.getElementById('result-annonce').style.display = 'block';
+  }
+  setLoading('btn-annonce', false, '✨ Générer l\'annonce');
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ Copié !';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
